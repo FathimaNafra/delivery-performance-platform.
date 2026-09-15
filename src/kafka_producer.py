@@ -15,7 +15,7 @@ df = pd.read_csv(
 )
 
 # Take only 5 orders for testing
-df = df.head(5)
+df = df.head(100)
 
 # Send each order to Kafka
 for _, row in df.iterrows():
@@ -24,7 +24,8 @@ for _, row in df.iterrows():
         "order_id": row["order_id"],
         "customer_id": row["customer_id"],
         "order_status": row["order_status"],
-        "order_purchase_timestamp": row["order_purchase_timestamp"]
+        "order_purchase_timestamp": row["order_purchase_timestamp"],
+        "order_approved_at": row["order_approved_at"]
     }
 
     producer.send(
@@ -35,7 +36,7 @@ for _, row in df.iterrows():
     print("Sent:", order)
 
     # Wait 2 seconds before sending the next order
-    time.sleep(2)
+    time.sleep(0.1)
 
 producer.flush()
 producer.close()

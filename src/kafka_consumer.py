@@ -30,24 +30,25 @@ for message in consumer:
     print("Received:", order)
 
     cursor.execute(
-        """
-        INSERT INTO orders (
-            order_id,
-            customer_id,
-            order_status,
-            order_purchase_timestamp
-        )
-        VALUES (%s, %s, %s, %s)
-        ON CONFLICT (order_id) DO NOTHING
-        """,
-        (
-            order["order_id"],
-            order["customer_id"],
-            order["order_status"],
-            order["order_purchase_timestamp"]
-        )
+    """
+    INSERT INTO orders (
+        order_id,
+        customer_id,
+        order_status,
+        order_purchase_timestamp,
+        order_approved_at
     )
-
+    VALUES (%s, %s, %s, %s, %s)
+    ON CONFLICT (order_id) DO NOTHING
+    """,
+    (
+        order["order_id"],
+        order["customer_id"],
+        order["order_status"],
+        order["order_purchase_timestamp"],
+        order["order_approved_at"]
+    )
+)
     db.commit()
 
     print("Saved to PostgreSQL:", order["order_id"])
