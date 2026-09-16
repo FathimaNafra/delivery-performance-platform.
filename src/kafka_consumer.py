@@ -36,17 +36,23 @@ for message in consumer:
         customer_id,
         order_status,
         order_purchase_timestamp,
-        order_approved_at
+        order_approved_at,
+        customer_city,
+        customer_state
     )
-    VALUES (%s, %s, %s, %s, %s)
-    ON CONFLICT (order_id) DO NOTHING
+    VALUES (%s, %s, %s, %s, %s, %s, %s)
+    ON CONFLICT (order_id) DO UPDATE SET
+        customer_city = EXCLUDED.customer_city,
+        customer_state = EXCLUDED.customer_state
     """,
     (
         order["order_id"],
         order["customer_id"],
         order["order_status"],
         order["order_purchase_timestamp"],
-        order["order_approved_at"]
+        order["order_approved_at"],
+        order["customer_city"],
+        order["customer_state"]
     )
 )
     db.commit()

@@ -14,6 +14,23 @@ df = pd.read_csv(
     "data/raw/olist_orders_dataset.csv"
 )
 
+# Read the Olist customers dataset
+customers = pd.read_csv(
+    "data/raw/olist_customers_dataset.csv"
+)
+
+df = df.merge(
+    customers[
+        [
+            "customer_id",
+            "customer_city",
+            "customer_state"
+        ]
+    ],
+    on="customer_id",
+    how="left"
+)
+
 # Take only 5 orders for testing
 df = df.head(100)
 
@@ -25,7 +42,9 @@ for _, row in df.iterrows():
         "customer_id": row["customer_id"],
         "order_status": row["order_status"],
         "order_purchase_timestamp": row["order_purchase_timestamp"],
-        "order_approved_at": row["order_approved_at"]
+        "order_approved_at": row["order_approved_at"],
+        "customer_city": row["customer_city"],
+        "customer_state": row["customer_state"]
     }
 
     producer.send(
