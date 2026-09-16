@@ -23,6 +23,26 @@ order_items = pd.read_csv(
     "data/raw/olist_order_items_dataset.csv"
 )
 
+sellers = pd.read_csv(
+    "data/raw/olist_sellers_dataset.csv"
+)
+
+order_items_with_sellers = order_items.merge(
+    sellers[
+        [
+            "seller_id",
+            "seller_city",
+            "seller_state"
+        ]
+    ],
+    on="seller_id",
+    how="left"
+)
+
+seller_summary = order_items_with_sellers.groupby("order_id").agg(
+    seller_count=("seller_id", "nunique")
+).reset_index()
+
 order_summary = order_items.groupby("order_id").agg(
     item_count=("order_item_id", "count"),
     total_price=("price", "sum"),
@@ -46,6 +66,12 @@ df = df.merge(
     how="left"
 )
 
+df = df.merge(
+    seller_summary,
+    on="order_id",
+    how="left"
+)
+
 # Take only 5 orders for testing
 df = df.head(100)
 
@@ -62,7 +88,8 @@ for _, row in df.iterrows():
         "customer_state": row["customer_state"],
         "item_count": int(row["item_count"]),
         "total_price": float(row["total_price"]),
-        "total_freight": float(row["total_freight"])
+        "total_freight": float(row["total_freight"]),
+        "seller_count": int(row["seller_count"])
     }
 
     producer.send(
@@ -78,4 +105,4 @@ for _, row in df.iterrows():
 producer.flush()
 producer.close()
 
-print("\nFinished sending 5 Olist orders.")
+print("\nFinished sending 100 Olist orders.")

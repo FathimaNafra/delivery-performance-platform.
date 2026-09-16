@@ -42,6 +42,7 @@ for message in consumer:
         item_count,
         total_price,
         total_freight
+        seller_count
     )
     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
     ON CONFLICT (order_id) DO UPDATE SET
@@ -49,7 +50,8 @@ for message in consumer:
         customer_state = EXCLUDED.customer_state,
         item_count = EXCLUDED.item_count,
         total_price = EXCLUDED.total_price,
-        total_freight = EXCLUDED.total_freight
+        total_freight = EXCLUDED.total_freight,
+        seller_count = EXCLUDED.seller_count
     """,
     (
         order["order_id"],
@@ -61,7 +63,8 @@ for message in consumer:
         order["customer_state"],
         order["item_count"],
         order["total_price"],
-        order["total_freight"]
+        order["total_freight"],
+        order["seller_count"]
     )
 )
     db.commit()
