@@ -19,6 +19,15 @@ customers = pd.read_csv(
     "data/raw/olist_customers_dataset.csv"
 )
 
+order_items = pd.read_csv(
+    "data/raw/olist_order_items_dataset.csv"
+)
+
+order_summary = order_items.groupby("order_id").agg(
+    item_count=("order_item_id", "count"),
+    total_price=("price", "sum"),
+    total_freight=("freight_value", "sum")
+).reset_index()
 df = df.merge(
     customers[
         [
@@ -28,6 +37,12 @@ df = df.merge(
         ]
     ],
     on="customer_id",
+    how="left"
+)
+
+df = df.merge(
+    order_summary,
+    on="order_id",
     how="left"
 )
 
@@ -44,7 +59,10 @@ for _, row in df.iterrows():
         "order_purchase_timestamp": row["order_purchase_timestamp"],
         "order_approved_at": row["order_approved_at"],
         "customer_city": row["customer_city"],
-        "customer_state": row["customer_state"]
+        "customer_state": row["customer_state"],
+        "item_count": int(row["item_count"]),
+        "total_price": float(row["total_price"]),
+        "total_freight": float(row["total_freight"])
     }
 
     producer.send(

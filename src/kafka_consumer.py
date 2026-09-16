@@ -38,12 +38,18 @@ for message in consumer:
         order_purchase_timestamp,
         order_approved_at,
         customer_city,
-        customer_state
+        customer_state,
+        item_count,
+        total_price,
+        total_freight
     )
-    VALUES (%s, %s, %s, %s, %s, %s, %s)
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
     ON CONFLICT (order_id) DO UPDATE SET
         customer_city = EXCLUDED.customer_city,
-        customer_state = EXCLUDED.customer_state
+        customer_state = EXCLUDED.customer_state,
+        item_count = EXCLUDED.item_count,
+        total_price = EXCLUDED.total_price,
+        total_freight = EXCLUDED.total_freight
     """,
     (
         order["order_id"],
@@ -52,7 +58,10 @@ for message in consumer:
         order["order_purchase_timestamp"],
         order["order_approved_at"],
         order["customer_city"],
-        order["customer_state"]
+        order["customer_state"],
+        order["item_count"],
+        order["total_price"],
+        order["total_freight"]
     )
 )
     db.commit()
